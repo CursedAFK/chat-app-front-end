@@ -1,26 +1,35 @@
 'use client'
 
-import { FormEvent, useRef } from 'react'
+import { FormEvent, useEffect, useRef, useState } from 'react'
 import { useAuth } from '@/app/(context)/AuthContext'
 import Input from '@/app/(components)/Input'
 import Button from '@/app/(components)/Button'
+import { useRouter } from 'next/navigation'
 
 const Login = () => {
-  const { login } = useAuth()
+  const [isLoading, setIsLoading] = useState(true)
+
+  const { login, user } = useAuth()
+
+  const router = useRouter()
 
   const usernameRef = useRef<HTMLInputElement>(null)
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-
     if (login.isLoading) return
-
     const username = usernameRef.current?.value
-
     if (username === null || username === '') return
-
     login.mutate(username!)
   }
+
+  useEffect(() => {
+    if (user) {
+      router.push('/')
+    } else setIsLoading(false)
+  }, [user])
+
+  if (isLoading) return <h2 className='text-center text-3xl'>Loading...</h2>
 
   return (
     <>
